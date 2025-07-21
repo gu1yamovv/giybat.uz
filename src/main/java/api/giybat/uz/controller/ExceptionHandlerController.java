@@ -1,6 +1,6 @@
 package api.giybat.uz.controller;
 
-import api.giybat.uz.service.AppBadException;
+import api.giybat.uz.exps.AppBadException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

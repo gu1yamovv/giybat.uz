@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface ProfileRepository extends CrudRepository<ProfileEntity,Integer >{
 
-    Optional<ProfileEntity> findByUsernameVisibleTrue(String username);
+    Optional<ProfileEntity> findByUsernameAndVisibleTrue(String username);
 
 }
