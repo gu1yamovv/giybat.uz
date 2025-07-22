@@ -9,8 +9,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ExceptionHandlerController {
 
 
-    @ExceptionHandler(AppBadException.class)
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handle(AppBadException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handle(RuntimeException e) {
+        e.printStackTrace();
+        return ResponseEntity.internalServerError().body(e.getMessage());
+    }
+
+
 }

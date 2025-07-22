@@ -22,5 +22,12 @@ public class AuthController {
         return ResponseEntity.ok().body(authService.registration(dto));
     }
 
+//    @PostMapping("/registration")
+//    public ResponseEntity<String> registration(@RequestBody RegistrationDTO dto) {
+//        String response = authService.registration(dto);
+//        return ResponseEntity.ok().body(response);
+//    }
+
+
 
 }
