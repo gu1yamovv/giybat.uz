@@ -2,9 +2,12 @@ package api.giybat.uz.service;
 
 import api.giybat.uz.dto.RegistrationDTO;
 import api.giybat.uz.entity.ProfileEntity;
+import api.giybat.uz.entity.ProfileRoleEntity;
 import api.giybat.uz.enums.GeneralStatus;
+import api.giybat.uz.enums.ProfileRole;
 import api.giybat.uz.exps.AppBadException;
 import api.giybat.uz.repository.ProfileRepository;
+import api.giybat.uz.repository.ProfileRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,13 +22,17 @@ public class AuthService {
     private ProfileRepository profileRepository;
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-
+    @Autowired
+    private ProfileRoleRepository profileRoleRepository;
+    @Autowired
+    private ProfileRoleService profileRoleService;
 
     public String registration(RegistrationDTO dto) {
         Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(dto.getUsername());
         if (optional.isPresent()) {
             ProfileEntity profile = optional.get();
             if (profile.getStatus().equals(GeneralStatus.IN_REGISTRATION)) {
+                profileRoleService.deleteRoles(profile.getId());
                 profileRepository.delete(profile);
 
             } else {
@@ -40,7 +47,7 @@ public class AuthService {
         entity.setVisible(true);
         entity.setCreatedDate(LocalDateTime.now());
         profileRepository.save(entity);
-
+        profileRoleService.create(entity.getId(), ProfileRole.ROLE_USER);
 
         return "Successfully registered";
     }
