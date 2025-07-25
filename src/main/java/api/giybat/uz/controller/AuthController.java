@@ -5,13 +5,10 @@ import api.giybat.uz.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
     @Autowired
@@ -23,11 +20,13 @@ public class AuthController {
         return ResponseEntity.ok().body(authService.registration(dto));
     }
 
-//    @PostMapping("/registration")
-//    public ResponseEntity<String> registration(@RequestBody RegistrationDTO dto) {
-//        String response = authService.registration(dto);
-//        return ResponseEntity.ok().body(response);
-//    }
+
+
+    @GetMapping("/registration/verification/{profileId}")
+    public ResponseEntity<String> regVerification(@PathVariable ("profileId") Integer profileId) {
+        return ResponseEntity.ok().body(authService.regVerification(profileId));
+    }
+
 
 
 

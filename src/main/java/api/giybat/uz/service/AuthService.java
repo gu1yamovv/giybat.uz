@@ -26,6 +26,11 @@ public class AuthService {
     private ProfileRoleRepository profileRoleRepository;
     @Autowired
     private ProfileRoleService profileRoleService;
+    @Autowired
+    private EmailSendingService emailSendingService;
+    @Autowired
+    private ProfileService profileService;
+
 
     public String registration(RegistrationDTO dto) {
         Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(dto.getUsername());
@@ -48,8 +53,23 @@ public class AuthService {
         entity.setCreatedDate(LocalDateTime.now());
         profileRepository.save(entity);
         profileRoleService.create(entity.getId(), ProfileRole.ROLE_USER);
-
+        emailSendingService.sendRegistrationEmail(dto.getUsername(), entity.getId());
         return "Successfully registered";
     }
+
+    public String regVerification(Integer profileId) {
+        ProfileEntity profile = profileService.getById(profileId);
+        if (profile.getStatus().equals(GeneralStatus.IN_REGISTRATION)) {
+            profileRepository.changeStatus(profileId, GeneralStatus.ACTIVE);
+            return "Verification finished";
+        }
+        throw new AppBadException("Verification Failed");
+
+    }
+
+
+
+
+
 
 }
