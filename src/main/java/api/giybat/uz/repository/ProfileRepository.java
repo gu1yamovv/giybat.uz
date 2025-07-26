@@ -18,6 +18,6 @@ public interface ProfileRepository extends CrudRepository<ProfileEntity, Integer
 
     @Modifying
     @Transactional
-    @Query("UPDATE ProfileEntity set status = ?2 where id = ?1")
+    @Query("update ProfileEntity set status = ?2 where id = ?1")
     void changeStatus(Integer id, GeneralStatus status);
 }

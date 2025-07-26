@@ -14,10 +14,16 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+//    @PostMapping("/registration")
+//    public ResponseEntity<String> registration(@Valid @RequestBody RegistrationDTO dto) {
+//        authService.registration(dto);
+//        return ResponseEntity.ok().body(authService.registration(dto));
+//    }
+
     @PostMapping("/registration")
     public ResponseEntity<String> registration(@Valid @RequestBody RegistrationDTO dto) {
-        authService.registration(dto);
-        return ResponseEntity.ok().body(authService.registration(dto));
+        String response = authService.registration(dto);
+        return ResponseEntity.ok().body(response);
     }
 
 

@@ -8,6 +8,7 @@ import api.giybat.uz.enums.ProfileRole;
 import api.giybat.uz.exps.AppBadException;
 import api.giybat.uz.repository.ProfileRepository;
 import api.giybat.uz.repository.ProfileRoleRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class AuthService {
     @Autowired
     private ProfileService profileService;
 
-
+    @Transactional
     public String registration(RegistrationDTO dto) {
         Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(dto.getUsername());
         if (optional.isPresent()) {
@@ -66,10 +67,6 @@ public class AuthService {
         throw new AppBadException("Verification Failed");
 
     }
-
-
-
-
 
 
 }
