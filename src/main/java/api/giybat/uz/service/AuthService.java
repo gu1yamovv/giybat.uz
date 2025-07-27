@@ -1,5 +1,7 @@
 package api.giybat.uz.service;
 
+import api.giybat.uz.dto.AuthDTO;
+import api.giybat.uz.dto.ProfileDTO;
 import api.giybat.uz.dto.RegistrationDTO;
 import api.giybat.uz.entity.ProfileEntity;
 import api.giybat.uz.entity.ProfileRoleEntity;
@@ -33,6 +35,7 @@ public class AuthService {
     private EmailSendingService emailSendingService;
     @Autowired
     private ProfileService profileService;
+
 
     @Transactional
     public String registration(RegistrationDTO dto) {
@@ -70,13 +73,33 @@ public class AuthService {
                 return "Verification finished";
             }
 
-        }catch (JwtException e) {
+        } catch (JwtException e) {
 
         }
 
         throw new AppBadException("Verification Failed");
+    }
 
+    public ProfileDTO login(AuthDTO dto) {
+        Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(dto.getUsername());
+        if (optional.isEmpty()) {
+            throw new AppBadException("Username or password is wrong");
+        }
+        ProfileEntity profile = optional.get();
+        if (!bCryptPasswordEncoder.matches(dto.getPassword(), profile.getPassword())) {
+            throw new AppBadException("Username or password is wrong");
+        }
+        if (!profile.getStatus().equals(GeneralStatus.ACTIVE)) {
+            throw new AppBadException("Status is wrong");
+        }
 
+        ProfileDTO response = new ProfileDTO();
+        response.setName(profile.getName());
+        response.setUsername(profile.getUsername());
+        response.setRoleList(profileRoleRepository.getAllRolesListByProfileId(profile.getId()));
+        response.setJwtToken(JwtUtil.encode(profile.getId(), response.getRoleList()));
+
+        return response;
     }
 
 

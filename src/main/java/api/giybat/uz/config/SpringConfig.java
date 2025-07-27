@@ -46,11 +46,14 @@ public class SpringConfig {
             authorizationManagerRequestMatcherRegistry
                     .requestMatchers(
                             "/api/v1/auth/registration",
-                            "/api/v1/auth/registration/verification/**"
+                            "/api/v1/auth/registration/verification/**",
+                            "/api/v1/auth/**",
+                            "/api/v1/auth/login" // Faqat login qo‘shildi
                     ).permitAll()
                     .anyRequest()
                     .authenticated();
         });
+
 
         http.csrf(AbstractHttpConfigurer::disable); // csrf ochirilgan
         http.cors(httpSecurityCorsConfigurer -> {
