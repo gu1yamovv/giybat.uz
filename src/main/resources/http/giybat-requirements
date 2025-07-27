@@ -183,7 +183,15 @@
 
 
 
+git checkout _____
+git add .
+git commit -m "   ";
+git push origin ____
 
+
+git checkout main
+git merge ____
+git push origin main
 
 
 

@@ -1,5 +1,6 @@
 package api.giybat.uz.service;
 
+import api.giybat.uz.util.JwtUtil;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class EmailSendingService {
 
     @Value("${spring.mail.username}")
     private String fromAccount;
+
+    @Value("${server.domain}")
+    private String serverDomain;
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -51,7 +55,7 @@ public class EmailSendingService {
                 "<p>\n" +
                 "    Please click the button to complete the registration:\n" +
                 "    <a class=\"button-link\"\n" +
-                "       href=\"http://localhost:8080/api/v1/auth/registration/verification/%d\"\n" +
+                "       href=\"%s/api/v1/auth/registration/verification/%s\"\n" +
                 "       target=\"_blank\">\n" +
                 "       Click here\n" +
                 "    </a>\n" +
@@ -59,7 +63,8 @@ public class EmailSendingService {
                 "\n" +
                 "</body>\n" +
                 "</html>\n";
-        body = String.format(body, profileId);
+        body = String.format(body,serverDomain, JwtUtil.encode(profileId));
+        System.out.println(JwtUtil.encode(profileId));
         sendMimeEmail(email,subject,body);
     }
 

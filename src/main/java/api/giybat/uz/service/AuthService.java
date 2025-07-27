@@ -8,6 +8,8 @@ import api.giybat.uz.enums.ProfileRole;
 import api.giybat.uz.exps.AppBadException;
 import api.giybat.uz.repository.ProfileRepository;
 import api.giybat.uz.repository.ProfileRoleRepository;
+import api.giybat.uz.util.JwtUtil;
+import io.jsonwebtoken.JwtException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -58,13 +60,22 @@ public class AuthService {
         return "Successfully registered";
     }
 
-    public String regVerification(Integer profileId) {
-        ProfileEntity profile = profileService.getById(profileId);
-        if (profile.getStatus().equals(GeneralStatus.IN_REGISTRATION)) {
-            profileRepository.changeStatus(profileId, GeneralStatus.ACTIVE);
-            return "Verification finished";
+    public String regVerification(String token) {
+        Integer profileId = JwtUtil.decodeRegVerToken(token);
+
+        try {
+            ProfileEntity profile = profileService.getById(profileId);
+            if (profile.getStatus().equals(GeneralStatus.IN_REGISTRATION)) {
+                profileRepository.changeStatus(profileId, GeneralStatus.ACTIVE);
+                return "Verification finished";
+            }
+
+        }catch (JwtException e) {
+
         }
+
         throw new AppBadException("Verification Failed");
+
 
     }
 
