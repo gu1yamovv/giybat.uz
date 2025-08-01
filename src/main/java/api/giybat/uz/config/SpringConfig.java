@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
@@ -26,6 +27,15 @@ import java.util.UUID;
 public class SpringConfig {
     @Autowired
     private UserDetailsService userDetailsService;
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public static final String[] AUTH_WHITELIST = {
+            "/api/v1/auth/registration",
+            "/api/v1/auth/registration/verification/**",
+            "/api/v1/auth/**",
+            "/api/v1/auth/login"
+    };
 
     @Bean
     public AuthenticationProvider authenticationProvider(BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -39,15 +49,10 @@ public class SpringConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
             authorizationManagerRequestMatcherRegistry
-                    .requestMatchers(
-                            "/api/v1/auth/registration",
-                            "/api/v1/auth/registration/verification/**",
-                            "/api/v1/auth/**",
-                            "/api/v1/auth/login" // Faqat login qo‘shildi
-                    ).permitAll()
+                    .requestMatchers(AUTH_WHITELIST).permitAll()
                     .anyRequest()
                     .authenticated();
-        });
+        }).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 
         http.csrf(AbstractHttpConfigurer::disable); // csrf ochirilgan

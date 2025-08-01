@@ -1,0 +1,3 @@
+POST localhost:8080/gossip/create
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlcyI6IlJPTEVfVVNFUixST0xFX0FETUlOIiwiaWF0IjoxNzU0MDIwOTcwLCJleHAiOjE3NTQxMDczNzB9.pFuhalokscCsNjSnRg7Ws0I9RGnB3yuxU3gH4uDz0TbqwbYaPFTZELziWwCcFWrAHFLcntvQvZ8QRzuzT2jQkQ
