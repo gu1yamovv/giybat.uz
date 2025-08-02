@@ -39,7 +39,7 @@ public class JwtUtil {
         return Jwts
                 .builder()
                 .subject(username)
-                .setClaims(claims)
+                .claims(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + tokenLiveTime))
                 .signWith(getSignInKey())
