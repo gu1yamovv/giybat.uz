@@ -5,6 +5,7 @@ import api.giybat.uz.dto.ProfileDTO;
 import api.giybat.uz.dto.RegistrationDTO;
 import api.giybat.uz.entity.ProfileEntity;
 import api.giybat.uz.entity.ProfileRoleEntity;
+import api.giybat.uz.enums.AppLanguage;
 import api.giybat.uz.enums.GeneralStatus;
 import api.giybat.uz.enums.ProfileRole;
 import api.giybat.uz.exps.AppBadException;
@@ -14,10 +15,12 @@ import api.giybat.uz.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -35,10 +38,12 @@ public class AuthService {
     private EmailSendingService emailSendingService;
     @Autowired
     private ProfileService profileService;
+    @Autowired
+    private ResourceBundleMessageSource bundleMessage;
 
 
     @Transactional
-    public String registration(RegistrationDTO dto) {
+    public String registration(RegistrationDTO dto, AppLanguage lang) {
         Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(dto.getUsername());
         if (optional.isPresent()) {
             ProfileEntity profile = optional.get();
@@ -47,7 +52,7 @@ public class AuthService {
                 profileRepository.delete(profile);
 
             } else {
-                throw new AppBadException("Username is already exits");
+                throw new AppBadException(bundleMessage.getMessage("email.phone.exits",null,new Locale(lang.name())));
             }
         }
         ProfileEntity entity = new ProfileEntity();
@@ -60,7 +65,7 @@ public class AuthService {
         profileRepository.save(entity);
         profileRoleService.create(entity.getId(), ProfileRole.ROLE_USER);
         emailSendingService.sendRegistrationEmail(dto.getUsername(), entity.getId());
-        return "Successfully registered";
+        return "Email-ga aktivatsiya linki jo'natildi.";
     }
 
     public String regVerification(String token) {

@@ -4,7 +4,7 @@ import api.giybat.uz.config.CustomUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-i
+
 
 public class SpringSecurityUtil {
 
