@@ -32,14 +32,16 @@ public class AuthController {
 
 
     @GetMapping("/registration/verification/{token}")
-    public ResponseEntity<String> regVerification(@PathVariable("token") String token) {
-        return ResponseEntity.ok().body(authService.regVerification(token));
+    public ResponseEntity<String> regVerification(@PathVariable("token") String token,
+                                                  @RequestHeader("Accept-Language") AppLanguage lang) {
+        return ResponseEntity.ok().body(authService.regVerification(token, lang));
     }
 
 
     @PostMapping("/login")
-    public ResponseEntity<ProfileDTO> login(@Valid @RequestBody AuthDTO dto) {
-        return ResponseEntity.ok().body(authService.login(dto));
+    public ResponseEntity<ProfileDTO> login(@Valid @RequestBody AuthDTO dto,
+                                            @RequestHeader("Accept-Language") AppLanguage lang) {
+        return ResponseEntity.ok().body(authService.login(dto, lang));
     }
 
     //resend

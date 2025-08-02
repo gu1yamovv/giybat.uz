@@ -39,7 +39,7 @@ public class AuthService {
     @Autowired
     private ProfileService profileService;
     @Autowired
-    private ResourceBundleMessageSource bundleMessage;
+    private ResourceBundleService bundleService;
 
 
     @Transactional
@@ -52,7 +52,7 @@ public class AuthService {
                 profileRepository.delete(profile);
 
             } else {
-                throw new AppBadException(bundleMessage.getMessage("email.phone.exits",null,new Locale(lang.name())));
+                throw new AppBadException(bundleService.getMessage("email.phone.exits", lang));
             }
         }
         ProfileEntity entity = new ProfileEntity();
@@ -65,44 +65,44 @@ public class AuthService {
         profileRepository.save(entity);
         profileRoleService.create(entity.getId(), ProfileRole.ROLE_USER);
         emailSendingService.sendRegistrationEmail(dto.getUsername(), entity.getId());
-        return "Email-ga aktivatsiya linki jo'natildi.";
+        return bundleService.getMessage("email.confirm.send", lang);
     }
 
-    public String regVerification(String token) {
+    public String regVerification(String token, AppLanguage lang) {
         Integer profileId = JwtUtil.decodeRegVerToken(token);
 
         try {
             ProfileEntity profile = profileService.getById(profileId);
             if (profile.getStatus().equals(GeneralStatus.IN_REGISTRATION)) {
                 profileRepository.changeStatus(profileId, GeneralStatus.ACTIVE);
-                return "Verification finished";
+                return bundleService.getMessage("verification.finished", lang);
             }
 
         } catch (JwtException e) {
 
         }
 
-        throw new AppBadException("Verification Failed");
+        throw new AppBadException(bundleService.getMessage("verification.failed", lang));
     }
 
-    public ProfileDTO login(AuthDTO dto) {
+    public ProfileDTO login(AuthDTO dto,AppLanguage lang) {
         Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(dto.getUsername());
         if (optional.isEmpty()) {
-            throw new AppBadException("Username or password is wrong");
+            throw new AppBadException(bundleService.getMessage("username.password.wrong", lang));
         }
         ProfileEntity profile = optional.get();
         if (!bCryptPasswordEncoder.matches(dto.getPassword(), profile.getPassword())) {
-            throw new AppBadException("Username or password is wrong");
+            throw new AppBadException(bundleService.getMessage("username.password.wrong", lang));
         }
         if (!profile.getStatus().equals(GeneralStatus.ACTIVE)) {
-            throw new AppBadException("Status is wrong");
+            throw new AppBadException(bundleService.getMessage("wrong.status", lang));
         }
 
         ProfileDTO response = new ProfileDTO();
         response.setName(profile.getName());
         response.setUsername(profile.getUsername());
         response.setRoleList(profileRoleRepository.getAllRolesListByProfileId(profile.getId()));
-        response.setJwtToken(JwtUtil.encode(profile.getUsername(),profile.getId(), response.getRoleList()));
+        response.setJwtToken(JwtUtil.encode(profile.getUsername(), profile.getId(), response.getRoleList()));
 
         return response;
     }
