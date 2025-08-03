@@ -64,7 +64,7 @@ public class AuthService {
         entity.setCreatedDate(LocalDateTime.now());
         profileRepository.save(entity);
         profileRoleService.create(entity.getId(), ProfileRole.ROLE_USER);
-        emailSendingService.sendRegistrationEmail(dto.getUsername(), entity.getId());
+        emailSendingService.sendRegistrationEmail(dto.getUsername(), entity.getId(),lang);
         return bundleService.getMessage("email.confirm.send", lang);
     }
 
