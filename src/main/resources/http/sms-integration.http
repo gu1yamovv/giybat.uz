@@ -1,0 +1,22 @@
+### Eskiz Login
+POST https:// notify.eskiz.uz/api/auth/login
+Content-Type: application/json
+
+
+{
+  "email": "ulugdev71@gmail.com",
+  "password": "EC5qCy0JIrJgAPcjpvdBKUV1oSj4cloMHw9JRyuJ"
+}
+
+
+
+### Eskiz Sms send
+POST https://notify.eskiz.uz/api/message/sms/send
+Content-Type: application/json
+Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTY3OTQ4NDEsImlhdCI6MTc1NDIwMjg0MSwicm9sZSI6InRlc3QiLCJzaWduIjoiZmYzNzM3ZmVjNTcxNGEwODYwNWYyY2FmNDYzZDY3MWU5NTU4MDcwMWQ2NTM3YWIwMDU0OGJkNDdlMjhhMzMwMyIsInN1YiI6IjExOTg2In0.UA55U9EpR5PGATnLwmahWQHrniGroi3FCU5XNzBUbN8
+
+{
+  "mobile_phone": "998884973535",
+  "message": "Bu Eskiz dan test",
+  "from": "4546"
+}
