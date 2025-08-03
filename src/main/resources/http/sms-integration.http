@@ -1,5 +1,5 @@
 ### Eskiz Login
-POST https:// notify.eskiz.uz/api/auth/login
+POST https://notify.eskiz.uz/api/auth/login
 Content-Type: application/json
 
 
