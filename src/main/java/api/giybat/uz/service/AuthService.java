@@ -40,6 +40,8 @@ public class AuthService {
     private ProfileService profileService;
     @Autowired
     private ResourceBundleService bundleService;
+    @Autowired
+    private SmsSendService smsSendService;
 
 
     @Transactional
@@ -64,7 +66,10 @@ public class AuthService {
         entity.setCreatedDate(LocalDateTime.now());
         profileRepository.save(entity);
         profileRoleService.create(entity.getId(), ProfileRole.ROLE_USER);
-        emailSendingService.sendRegistrationEmail(dto.getUsername(), entity.getId(),lang);
+//send
+        smsSendService.sendRegistrationSms(dto.getUsername());
+      //  emailSendingService.sendRegistrationEmail(dto.getUsername(), entity.getId(), lang);
+
         return bundleService.getMessage("email.confirm.send", lang);
     }
 
@@ -85,7 +90,7 @@ public class AuthService {
         throw new AppBadException(bundleService.getMessage("verification.failed", lang));
     }
 
-    public ProfileDTO login(AuthDTO dto,AppLanguage lang) {
+    public ProfileDTO login(AuthDTO dto, AppLanguage lang) {
         Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(dto.getUsername());
         if (optional.isEmpty()) {
             throw new AppBadException(bundleService.getMessage("username.password.wrong", lang));

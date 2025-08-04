@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "sms_provider_token_holder_entity")
+@Table(name = "sms_provider_token_holder")
 public class SmsProviderTokenHolderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

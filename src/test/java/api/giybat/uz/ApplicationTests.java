@@ -16,11 +16,11 @@ class ApplicationTests {
     @Test
     void contextLoads() {
         // smsSendService.getToken();
-        smsSendService.sendSms("998884973535",
-                "Bu Eskiz dan test",
-                "12345",
-                SmsType.REGISTRATION);
 
-    }
+//        smsSendService.sendSms("998884973535",
+//                "Bu Eskiz dan test",
+//                "12345",
+//                SmsType.REGISTRATION);
+//    }
 
 }

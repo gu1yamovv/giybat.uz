@@ -8,6 +8,7 @@ import api.giybat.uz.entity.SmsProviderTokenHolderEntity;
 import api.giybat.uz.enums.SmsType;
 import api.giybat.uz.exps.AppBadException;
 import api.giybat.uz.repository.SmsProviderTokenHolderRepository;
+import api.giybat.uz.util.RandomUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,21 +43,31 @@ public class SmsSendService {
     private String accountPassword;
     private Integer smsLimit = 3;
 
-    public SmsSendResponseDTO sendSms(String phoneNumber, String message, String code, SmsType smsType) {
+
+    public void sendRegistrationSms(String phoneNumber) {
+        String code = RandomUtil.getRandomSmsCode();
+        String message = "Bu Eskiz dan test"; //  + code  ||  %s
+        message = String.format(message, code);
+        sendSms(phoneNumber, message, code, SmsType.REGISTRATION);
+    }
+
+
+    private SmsSendResponseDTO sendSms(String phoneNumber, String message, String code, SmsType smsType) {
         //check
         Long count = smsHistoryService.getSmsCount(phoneNumber);
         if (count > smsLimit) {
-            System.out.println("---Sms limit reached. Phone :" +phoneNumber);
-throw new AppBadException("Sms limit reached");
+            System.out.println("---Sms limit reached. Phone :" + phoneNumber);
+            throw new AppBadException("Sms limit reached");
         }
-
+        // send
         SmsSendResponseDTO result = sendSms(phoneNumber, message);
+        // save
         smsHistoryService.create(phoneNumber, message, code, smsType);
         return result;
     }
 
 
-    public SmsSendResponseDTO sendSms(String phoneNumber, String message) {
+    private SmsSendResponseDTO sendSms(String phoneNumber, String message) {
         String token = getToken();
         // header
         HttpHeaders headers = new HttpHeaders();
@@ -82,7 +93,7 @@ throw new AppBadException("Sms limit reached");
         }
     }
 
-    public String getToken() {
+    private String getToken() {
         Optional<SmsProviderTokenHolderEntity> optional = smsProviderTokenHolderRepository.findTop1By();
         if (optional.isEmpty()) {// if token not exists
             String token = getTokenFromProvider();
@@ -108,7 +119,7 @@ throw new AppBadException("Sms limit reached");
 
     }
 
-    public String getTokenFromProvider() {
+    private String getTokenFromProvider() {
         SmsAuthDTO smsAuthDTO = new SmsAuthDTO();
         smsAuthDTO.setEmail(accountLogin);
         smsAuthDTO.setPassword(accountPassword);
