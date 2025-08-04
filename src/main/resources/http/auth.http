@@ -5,13 +5,24 @@ Accept-Language: UZ
 
 
 {
-  "name": "Bob",
+  "name": "Boba",
   "username": "998884973535",
-  "password": "12345"
+  "password": "22281"
 }
 
 ###Registration verification
 GET http://localhost:8080/auth/registration/verification/{profileId}
+
+
+### Sms Registration verification
+POST localhost:8080/api/v1/auth/registration/sms/verification
+Content-Type: application/json
+
+{
+  "phone": "998884973535",
+  "code": "38822"
+}
+
 
 
 ### Login

@@ -3,6 +3,7 @@ package api.giybat.uz.service;
 import api.giybat.uz.dto.AuthDTO;
 import api.giybat.uz.dto.ProfileDTO;
 import api.giybat.uz.dto.RegistrationDTO;
+import api.giybat.uz.dto.sms.SmsVerificationDTO;
 import api.giybat.uz.entity.ProfileEntity;
 import api.giybat.uz.entity.ProfileRoleEntity;
 import api.giybat.uz.enums.AppLanguage;
@@ -42,6 +43,8 @@ public class AuthService {
     private ResourceBundleService bundleService;
     @Autowired
     private SmsSendService smsSendService;
+    @Autowired
+    private SmsHistoryService smsHistoryService;
 
 
     @Transactional
@@ -68,15 +71,14 @@ public class AuthService {
         profileRoleService.create(entity.getId(), ProfileRole.ROLE_USER);
 //send
         smsSendService.sendRegistrationSms(dto.getUsername());
-      //  emailSendingService.sendRegistrationEmail(dto.getUsername(), entity.getId(), lang);
+        //  emailSendingService.sendRegistrationEmail(dto.getUsername(), entity.getId(), lang);
 
         return bundleService.getMessage("email.confirm.send", lang);
     }
 
-    public String regVerification(String token, AppLanguage lang) {
-        Integer profileId = JwtUtil.decodeRegVerToken(token);
-
+    public String registrationEmailVerification(String token, AppLanguage lang) {
         try {
+            Integer profileId = JwtUtil.decodeRegVerToken(token);
             ProfileEntity profile = profileService.getById(profileId);
             if (profile.getStatus().equals(GeneralStatus.IN_REGISTRATION)) {
                 profileRepository.changeStatus(profileId, GeneralStatus.ACTIVE);
@@ -84,9 +86,7 @@ public class AuthService {
             }
 
         } catch (JwtException e) {
-
         }
-
         throw new AppBadException(bundleService.getMessage("verification.failed", lang));
     }
 
@@ -103,12 +103,32 @@ public class AuthService {
             throw new AppBadException(bundleService.getMessage("wrong.status", lang));
         }
 
+        return getLogInResponse(profile);
+    }
+
+
+    public ProfileDTO RegistrationSmsVerification(SmsVerificationDTO dto, AppLanguage lang) {
+        Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(dto.getPhone());
+        if (optional.isEmpty()) {
+            throw new AppBadException(bundleService.getMessage("verification.failed", lang));
+        }
+        ProfileEntity profile = optional.get();
+        if (!profile.getStatus().equals(GeneralStatus.IN_REGISTRATION)) {
+            throw new AppBadException(bundleService.getMessage("verification.failed", lang));
+        }
+        // code check
+        smsHistoryService.check(dto.getPhone(), dto.getCode(),lang);
+        //Active
+        profileRepository.changeStatus(profile.getId(), GeneralStatus.ACTIVE);
+        return getLogInResponse(profile);
+    }
+
+    public ProfileDTO getLogInResponse(ProfileEntity profile) {
         ProfileDTO response = new ProfileDTO();
         response.setName(profile.getName());
         response.setUsername(profile.getUsername());
         response.setRoleList(profileRoleRepository.getAllRolesListByProfileId(profile.getId()));
         response.setJwtToken(JwtUtil.encode(profile.getUsername(), profile.getId(), response.getRoleList()));
-
         return response;
     }
 
