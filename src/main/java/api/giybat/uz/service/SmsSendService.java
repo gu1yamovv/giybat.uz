@@ -6,6 +6,7 @@ import api.giybat.uz.dto.sms.SmsRequestDTO;
 import api.giybat.uz.dto.sms.SmsSendResponseDTO;
 import api.giybat.uz.entity.SmsProviderTokenHolderEntity;
 import api.giybat.uz.enums.SmsType;
+import api.giybat.uz.exps.AppBadException;
 import api.giybat.uz.repository.SmsProviderTokenHolderRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,8 +40,23 @@ public class SmsSendService {
     private String accountLogin;
     @Value("${eskiz.password}")
     private String accountPassword;
+    private Integer smsLimit = 3;
 
-    public SmsSendResponseDTO sendSms(String phoneNumber, String message, SmsType smsType) {
+    public SmsSendResponseDTO sendSms(String phoneNumber, String message, String code, SmsType smsType) {
+        //check
+        Long count = smsHistoryService.getSmsCount(phoneNumber);
+        if (count > smsLimit) {
+            System.out.println("---Sms limit reached. Phone :" +phoneNumber);
+throw new AppBadException("Sms limit reached");
+        }
+
+        SmsSendResponseDTO result = sendSms(phoneNumber, message);
+        smsHistoryService.create(phoneNumber, message, code, smsType);
+        return result;
+    }
+
+
+    public SmsSendResponseDTO sendSms(String phoneNumber, String message) {
         String token = getToken();
         // header
         HttpHeaders headers = new HttpHeaders();
@@ -59,9 +75,6 @@ public class SmsSendService {
                     HttpMethod.POST,
                     entity,
                     SmsSendResponseDTO.class);
-            smsHistoryService.create(phoneNumber,message,smsType);
-
-
             return response.getBody();
         } catch (RuntimeException e) {
             e.printStackTrace();

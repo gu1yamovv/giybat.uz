@@ -21,6 +21,8 @@ public class SmsHistoryEntity {
     private String phone;
     @Column(name = "message",columnDefinition = "text")
     private String message;
+    @Column(name = "code")
+    private String code;
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 

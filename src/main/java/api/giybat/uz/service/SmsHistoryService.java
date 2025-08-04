@@ -13,14 +13,20 @@ public class SmsHistoryService {
     @Autowired
     private SmsHistoryRepository smsHistoryRepository;
 
-    public void create(String phoneNumber, String message, SmsType smsType) {
+    public void create(String phoneNumber, String message, String code, SmsType smsType) {
         SmsHistoryEntity entity = new SmsHistoryEntity();
         entity.setPhone(phoneNumber);
         entity.setMessage(message);
+        entity.setCode(code);
         entity.setSmsType(smsType);
         entity.setCreatedDate(LocalDateTime.now());
         smsHistoryRepository.save(entity);
     }
 
+
+    public Long getSmsCount(String phone) {
+        LocalDateTime now = LocalDateTime.now();
+        return smsHistoryRepository.countByPhoneAndCreatedDateBetween(phone,now.minusMinutes(1),now);
+    }
 
 }
