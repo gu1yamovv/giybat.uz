@@ -24,6 +24,7 @@ public class SmsHistoryService {
         entity.setMessage(message);
         entity.setCode(code);
         entity.setSmsType(smsType);
+        entity.setAttemptCount(0);
         entity.setCreatedDate(LocalDateTime.now());
         smsHistoryRepository.save(entity);
     }
@@ -41,7 +42,12 @@ public class SmsHistoryService {
         }
         // check code
         SmsHistoryEntity entity = optional.get();
+        // attempt count
+        if (entity.getAttemptCount() >= 3) {
+            throw new AppBadException(bundleService.getMessage("verification.failed", lang));
+        }
         if (!entity.getCode().equals(code)) {
+            smsHistoryRepository.updateAttemptCount(entity.getId());
             throw new AppBadException(bundleService.getMessage("verification.failed", lang));
         }
         // check time
