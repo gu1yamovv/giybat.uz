@@ -19,7 +19,7 @@ public class SmsHistoryEntity {
 
     @Column(name = "phone")
     private String phone;
-    @Column(name = "message",columnDefinition = "text")
+    @Column(name = "message", columnDefinition = "text")
     private String message;
     @Column(name = "code")
     private String code;
@@ -29,4 +29,6 @@ public class SmsHistoryEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "sms_type")
     private SmsType smsType;
+    @Column(name = "attempt_count")
+    private Integer attemptCount = 0;
 }
