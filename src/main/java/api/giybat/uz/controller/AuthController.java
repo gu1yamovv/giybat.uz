@@ -3,6 +3,8 @@ package api.giybat.uz.controller;
 import api.giybat.uz.dto.AuthDTO;
 import api.giybat.uz.dto.ProfileDTO;
 import api.giybat.uz.dto.RegistrationDTO;
+import api.giybat.uz.dto.sms.AppResponse;
+import api.giybat.uz.dto.sms.SmsResendDTO;
 import api.giybat.uz.dto.sms.SmsVerificationDTO;
 import api.giybat.uz.enums.AppLanguage;
 import api.giybat.uz.service.AuthService;
@@ -42,7 +44,13 @@ public class AuthController {
     @PostMapping("/registration/sms/verification")
     public ResponseEntity<ProfileDTO> smsVerification(@Valid @RequestBody SmsVerificationDTO dto,
                                                       @RequestParam(value = "lang", defaultValue = "UZ") AppLanguage lang) {
-        return ResponseEntity.ok().body(authService.RegistrationSmsVerification(dto, lang));
+        return ResponseEntity.ok().body(authService.registrationSmsVerification(dto, lang));
+    }
+
+    @PostMapping("/registration/sms/verification/resend")
+    public ResponseEntity<AppResponse<String>> smsVerificationResend(@Valid @RequestBody SmsResendDTO dto,
+                                                             @RequestParam(value = "lang", defaultValue = "UZ") AppLanguage lang) {
+        return ResponseEntity.ok().body(authService.registrationSmsVerificationResend(dto, lang));
     }
 
 

@@ -3,9 +3,10 @@ package api.giybat.uz.service;
 import api.giybat.uz.dto.AuthDTO;
 import api.giybat.uz.dto.ProfileDTO;
 import api.giybat.uz.dto.RegistrationDTO;
+import api.giybat.uz.dto.sms.AppResponse;
+import api.giybat.uz.dto.sms.SmsResendDTO;
 import api.giybat.uz.dto.sms.SmsVerificationDTO;
 import api.giybat.uz.entity.ProfileEntity;
-import api.giybat.uz.entity.ProfileRoleEntity;
 import api.giybat.uz.enums.AppLanguage;
 import api.giybat.uz.enums.GeneralStatus;
 import api.giybat.uz.enums.ProfileRole;
@@ -15,13 +16,12 @@ import api.giybat.uz.repository.ProfileRoleRepository;
 import api.giybat.uz.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -107,7 +107,7 @@ public class AuthService {
     }
 
 
-    public ProfileDTO RegistrationSmsVerification(SmsVerificationDTO dto, AppLanguage lang) {
+    public ProfileDTO registrationSmsVerification(SmsVerificationDTO dto, AppLanguage lang) {
         Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(dto.getPhone());
         if (optional.isEmpty()) {
             throw new AppBadException(bundleService.getMessage("verification.failed", lang));
@@ -117,7 +117,7 @@ public class AuthService {
             throw new AppBadException(bundleService.getMessage("verification.failed", lang));
         }
         // code check
-        smsHistoryService.check(dto.getPhone(), dto.getCode(),lang);
+        smsHistoryService.check(dto.getPhone(), dto.getCode(), lang);
         //Active
         profileRepository.changeStatus(profile.getId(), GeneralStatus.ACTIVE);
         return getLogInResponse(profile);
@@ -133,4 +133,17 @@ public class AuthService {
     }
 
 
+    public AppResponse<String> registrationSmsVerificationResend(@Valid SmsResendDTO dto, AppLanguage lang) {
+        Optional<ProfileEntity> optional = profileRepository.findByUsernameAndVisibleTrue(dto.getPhone());
+        if (optional.isEmpty()) {
+            throw new AppBadException(bundleService.getMessage("verification.failed", lang));
+        }
+        ProfileEntity profile = optional.get();
+        if (!profile.getStatus().equals(GeneralStatus.IN_REGISTRATION)) {
+            throw new AppBadException(bundleService.getMessage("verification.failed", lang));
+        }
+        //resend sms
+        smsSendService.sendRegistrationSms(dto.getPhone());
+        return new AppResponse<String>(bundleService.getMessage("sms.resend",lang));
+    }
 }
